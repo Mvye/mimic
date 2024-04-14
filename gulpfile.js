@@ -1,11 +1,14 @@
-const gulp = require('gulp');
-const ts = require('gulp-typescript');
+// Using ES Modules import statements
+import gulp from 'gulp';
+import ts from 'gulp-typescript';
+
 const tsProject = ts.createProject('tsconfig.json');
 
-gulp.task('build', function () {
-    return tsProject.src()
-        .pipe(tsProject())
-        .js.pipe(gulp.dest('dist'));
-});
+export function build() {
+  return tsProject.src()
+    .pipe(tsProject())
+    .js.pipe(gulp.dest('dist'));
+}
 
-// Add more tasks if needed
+// Export tasks for CLI access
+export default build;
