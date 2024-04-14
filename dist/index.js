@@ -1,7 +1,8 @@
 import { config } from 'dotenv';
-import { Client, GatewayIntentBits, REST, Routes, Collection, Events } from 'discord.js';
+import { Client, GatewayIntentBits, REST, Routes, Collection, Events, EmbedBuilder } from 'discord.js';
 import { User } from "./models/User.js";
 import { AppDataSource } from "./data-source.js";
+import { roll } from './gacha.js';
 config();
 AppDataSource.initialize();
 // Explicitly declare these as strings and provide default values or handle undefined cases
@@ -70,6 +71,29 @@ client.on('interactionCreate', async (interaction) => {
         const target = interaction.options.getUser('user') ?? interaction.user;
         addBalance(target.id, 5);
     }
+    if (command.commandName === 'gacha') {
+        // todo: Check for sufficient balance
+        const resultIndex = roll();
+        let resultHexColor;
+        if (resultIndex === 3) {
+            resultHexColor = 0x1183a6;
+        }
+        else if (resultIndex === 4) {
+            resultHexColor = 0x9411a6;
+        }
+        else {
+            resultHexColor = 0xd4a715;
+        }
+        ;
+        const embedResult = new EmbedBuilder()
+            .setTitle("Roll Results")
+            .setDescription(`${command.user.displayName}, you have rolled a ${resultIndex}⭐.`)
+            .setColor(resultHexColor)
+            .setImage(command.user.avatarURL());
+        await command.reply({
+            embeds: [embedResult]
+        });
+    }
 });
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 async function main() {
@@ -89,6 +113,10 @@ async function main() {
         {
             name: 'faucet',
             description: 'Get a bit of currency.'
+        },
+        {
+            name: 'gacha',
+            description: 'What will you get?'
         }
     ];
     try {
