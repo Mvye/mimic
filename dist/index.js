@@ -10,14 +10,18 @@ const CLIENT_ID = process.env.MIMIC_BOT_CLIENT_ID ?? '';
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const currency = new Collection();
 async function addBalance(id, amount) {
+    console.log(id, amount);
     let user = currency.get(id);
     if (user) {
+        console.log(user);
         user.balance += amount;
     }
     else {
-        let user = new User();
-        user.user_id = id;
-        user.balance = amount;
+        console.log("Attempting to initialize new User");
+        let new_user = new User();
+        new_user.user_id = id;
+        new_user.balance = amount;
+        user = new_user;
     }
     await AppDataSource.manager.save(user);
     currency.set(id, user);
@@ -28,7 +32,8 @@ function getBalance(id) {
     return user ? user.balance : 0;
 }
 client.on(Events.ClientReady, async (readyClient) => {
-    const storedBalances = await AppDataSource.manager.find(User);
+    const storedBalances = await AppDataSource.manager.query(`SELECT * FROM user`);
+    console.log(storedBalances);
     storedBalances.forEach(b => currency.set(b.user_id, b));
     // Check if client.user is not null before logging
     if (client.user) {
@@ -41,6 +46,7 @@ client.on(Events.ClientReady, async (readyClient) => {
 client.on(Events.MessageCreate, async (message) => {
     if (message.author.bot)
         return;
+    console.log(`Detected message from ${message.author.id}`);
     addBalance(message.author.id, 1);
 });
 client.on('interactionCreate', async (interaction) => {
@@ -60,6 +66,10 @@ client.on('interactionCreate', async (interaction) => {
         const target = interaction.options.getUser('user') ?? interaction.user;
         await command.reply(`${target.tag} has ${getBalance(target.id)}💰`);
     }
+    if (command.commandName === 'faucet') {
+        const target = interaction.options.getUser('user') ?? interaction.user;
+        addBalance(target.id, 5);
+    }
 });
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 async function main() {
@@ -75,6 +85,10 @@ async function main() {
         {
             name: 'howmanyprimos',
             description: 'Checks your scuffed currency balance, which will eventually be tradeable for packs.',
+        },
+        {
+            name: 'faucet',
+            description: 'Get a bit of currency.'
         }
     ];
     try {

@@ -16,14 +16,18 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const currency: Collection<string, User> = new Collection();
 
 async function addBalance(id: string, amount: number): Promise<User> {
+    console.log(id, amount)
 	let user: User = currency.get(id);
 
 	if (user) {
+        console.log(user)
 		user.balance += amount;
 	} else {
-        let user: User = new User()
-        user.user_id = id
-        user.balance = amount
+        console.log("Attempting to initialize new User")
+        let new_user: User = new User()
+        new_user.user_id = id
+        new_user.balance = amount
+        user = new_user
     }
 
     await AppDataSource.manager.save(user)
@@ -37,7 +41,8 @@ function getBalance(id: string): number {
 }
 
 client.on(Events.ClientReady, async readyClient => {
-    const storedBalances = await AppDataSource.manager.find(User);
+    const storedBalances = await AppDataSource.manager.query(`SELECT * FROM public.user`);
+    console.log(storedBalances)
     storedBalances.forEach(b => currency.set(b.user_id, b))
 
     // Check if client.user is not null before logging
@@ -50,6 +55,7 @@ client.on(Events.ClientReady, async readyClient => {
 
 client.on(Events.MessageCreate, async message => {
     if (message.author.bot) return;
+    console.log(`Detected message from ${message.author.id}`)
     addBalance(message.author.id, 1);
 })
 
@@ -73,6 +79,11 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 		const target = interaction.options.getUser('user') ?? interaction.user;
 		await command.reply(`${target.tag} has ${getBalance(target.id)}💰`);
 	}
+
+    if (command.commandName === 'faucet') {
+		const target = interaction.options.getUser('user') ?? interaction.user;
+		addBalance(target.id, 5);
+	}
 });
 
 const rest = new REST({ version: '10' }).setToken(TOKEN);
@@ -95,6 +106,10 @@ async function main() {
         {
             name: 'howmanyprimos',
             description: 'Checks your scuffed currency balance, which will eventually be tradeable for packs.',
+        },
+        {
+            name: 'faucet',
+            description: 'Get a bit of currency.'
         }
     ];
 

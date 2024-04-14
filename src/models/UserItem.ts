@@ -12,7 +12,7 @@ export class UserItem extends BaseEntity {
     user_id!: User;
 
     @ManyToOne('ShopItem', 'item_id')
-    item_id!: User;
+    item_id!: ShopItem;
 
     @Column()
     amount!: number

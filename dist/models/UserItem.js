@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, BaseEntity } from "typeorm";
 import { User } from "./User.js";
+import { ShopItem } from "./ShopItem.js";
 let UserItem = class UserItem extends BaseEntity {
 };
 __decorate([
@@ -21,7 +22,7 @@ __decorate([
 ], UserItem.prototype, "user_id", void 0);
 __decorate([
     ManyToOne('ShopItem', 'item_id'),
-    __metadata("design:type", User)
+    __metadata("design:type", ShopItem)
 ], UserItem.prototype, "item_id", void 0);
 __decorate([
     Column(),

@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Entity, Column, PrimaryColumn, OneToMany, BaseEntity } from "typeorm";
+import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
 let User = class User extends BaseEntity {
     constructor() {
         super(...arguments);
@@ -16,7 +16,6 @@ let User = class User extends BaseEntity {
 };
 __decorate([
     PrimaryColumn(),
-    OneToMany('UserItem', 'user_id'),
     __metadata("design:type", String)
 ], User.prototype, "user_id", void 0);
 __decorate([
