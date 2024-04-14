@@ -6,10 +6,10 @@
       "rootDir": "./src",
       "esModuleInterop": true,
       "moduleResolution": "node",
-      "strict": true,
-      "skipLibCheck": true
+      "skipLibCheck": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
     },
-    "include": ["src/**/*"],
+    "include": ["src"],
     "exclude": ["node_modules"]
-  }
-  
+}
