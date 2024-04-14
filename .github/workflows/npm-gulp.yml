@@ -28,4 +28,4 @@ jobs:
     - name: Additional Deployment Steps
       run: |
         # Additional commands here if needed, like tests or deployments
-        npm run test  # Example command
+        npm start
