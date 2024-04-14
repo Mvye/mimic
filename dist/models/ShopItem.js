@@ -7,12 +7,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BaseEntity } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from "typeorm";
 let ShopItem = class ShopItem extends BaseEntity {
 };
 __decorate([
     PrimaryGeneratedColumn(),
-    OneToMany('UserItem', 'item_id'),
     __metadata("design:type", Number)
 ], ShopItem.prototype, "item_id", void 0);
 __decorate([

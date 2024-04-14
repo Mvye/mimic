@@ -12,7 +12,7 @@ AppDataSource.initialize();
 const TOKEN: string = process.env.MIMIC_BOT_TOKEN ?? '';
 const CLIENT_ID: string = process.env.MIMIC_BOT_CLIENT_ID ?? '';
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 const currency: Collection<string, User> = new Collection();
 
 async function addBalance(id: string, amount: number): Promise<User> {
@@ -30,7 +30,7 @@ async function addBalance(id: string, amount: number): Promise<User> {
         user = new_user
     }
 
-    await AppDataSource.manager.save(user)
+    await AppDataSource.manager.save(User, user)
     currency.set(id, user);
     return user;
 }

@@ -7,7 +7,7 @@ AppDataSource.initialize();
 // Explicitly declare these as strings and provide default values or handle undefined cases
 const TOKEN = process.env.MIMIC_BOT_TOKEN ?? '';
 const CLIENT_ID = process.env.MIMIC_BOT_CLIENT_ID ?? '';
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 const currency = new Collection();
 async function addBalance(id, amount) {
     console.log(id, amount);
@@ -23,7 +23,7 @@ async function addBalance(id, amount) {
         new_user.balance = amount;
         user = new_user;
     }
-    await AppDataSource.manager.save(user);
+    await AppDataSource.manager.save(User, user);
     currency.set(id, user);
     return user;
 }
@@ -32,7 +32,7 @@ function getBalance(id) {
     return user ? user.balance : 0;
 }
 client.on(Events.ClientReady, async (readyClient) => {
-    const storedBalances = await AppDataSource.manager.query(`SELECT * FROM user`);
+    const storedBalances = await AppDataSource.manager.query(`SELECT * FROM public.user`);
     console.log(storedBalances);
     storedBalances.forEach(b => currency.set(b.user_id, b));
     // Check if client.user is not null before logging

@@ -2,3 +2,6 @@
 .env
 # Ignore Node.js moduless
 node_modules/
+# Ignore QOL vscode add-ons
+.vscode/
+mimic.session.sql
