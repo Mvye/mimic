@@ -15,6 +15,10 @@ __decorate([
     __metadata("design:type", Number)
 ], ShopItem.prototype, "item_id", void 0);
 __decorate([
+    Column(),
+    __metadata("design:type", String)
+], ShopItem.prototype, "item_name", void 0);
+__decorate([
     Column("integer"),
     __metadata("design:type", Number)
 ], ShopItem.prototype, "cost", void 0);

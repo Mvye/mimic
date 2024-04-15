@@ -20,3 +20,21 @@ const db_options: DataSourceOptions = {
 };
 
 export const AppDataSource = new DataSource(db_options);
+
+export async function addShopItem(itemName: string, cost: number) {
+    try {
+        const item = new ShopItem();
+        item.item_name = itemName;
+        item.cost = cost;
+
+        await AppDataSource.manager.save(item);
+        console.log(`Item ${itemName} added to the shop with price $${cost}.`);
+    } catch (error) {
+        console.error('Failed to add item to shop:', error);
+    }
+}
+
+export async function populateShopItems() {
+    await addShopItem('Normal Scuffed Mimic:tm: Gacha Pack', 10);
+    await addShopItem('Super Rare Mimic:tm: Gacha Pack', 50);
+}
