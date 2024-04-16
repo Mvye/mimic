@@ -1,17 +1,17 @@
-import "reflect-metadata"
-import {createDatabase} from "typeorm-extension"
-import { DataSource, DataSourceOptions } from "typeorm"
-import { User } from "./models/User.js"
-import { ShopItem } from "./models/ShopItem.js"
-import { UserItem } from "./models/UserItem.js"
+import 'reflect-metadata';
+import { createDatabase } from 'typeorm-extension';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import { User } from './models/User.js';
+import { ShopItem } from './models/ShopItem.js';
+import { UserItem } from './models/UserItem.js';
 
 const db_options: DataSourceOptions = {
-    type: "postgres",
-    host: "localhost",
+    type: 'postgres',
+    host: 'localhost',
     port: 5432,
-    username: "mimic",
-    password: "frieren",
-    database: "mimic-test",
+    username: 'mimic',
+    password: 'frieren',
+    database: 'mimic-test',
     synchronize: true,
     logging: false,
     entities: [User, ShopItem, UserItem],
