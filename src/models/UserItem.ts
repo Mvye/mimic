@@ -1,7 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, BaseEntity } from "typeorm";
-import { User } from "./User.js"
-import { ShopItem } from "./ShopItem.js"
-
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    ManyToOne,
+    BaseEntity,
+} from 'typeorm';
+import { User } from './User.js';
+import { ShopItem } from './ShopItem.js';
 
 @Entity()
 export class UserItem extends BaseEntity {
@@ -15,5 +20,5 @@ export class UserItem extends BaseEntity {
     item_id!: ShopItem;
 
     @Column()
-    amount!: number
+    amount!: number;
 }

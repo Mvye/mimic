@@ -1,35 +1,36 @@
 {
-  "name": "mimic",
-  "version": "1.0.0",
-  "description": "A TypeScript Discord Bot",
-  "main": "dist/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "start:dev": "nodemon --exec ts-node src/index.ts",
-    "prestart": "npm run build"
-  },
-  "keywords": [
-    "discord",
-    "bot",
-    "typescript"
-  ],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "discord.js": "^14.14.1",
-    "pg": "^8.11.5",
-    "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.20",
-    "typeorm-extension": "^3.5.1"
-  },
-  "type": "module",
-  "devDependencies": {
-    "@types/node": "^17.0.45",
-    "dotenv": "^16.4.5",
-    "nodemon": "^2.0.20",
-    "ts-node": "^10.0.0",
-    "typescript": "^5.4.5"
-  }
+    "name": "mimic",
+    "version": "1.0.0",
+    "description": "A TypeScript Discord Bot",
+    "main": "dist/index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "start:dev": "nodemon --exec ts-node src/index.ts",
+        "prestart": "npm run build",
+        "typeorm": "typeorm-ts-node-commonjs"
+    },
+    "keywords": [
+        "discord",
+        "bot",
+        "typescript"
+    ],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "discord.js": "^14.14.1",
+        "pg": "^8.11.5",
+        "reflect-metadata": "^0.2.2",
+        "typeorm": "^0.3.20",
+        "typeorm-extension": "^3.5.1"
+    },
+    "type": "module",
+    "devDependencies": {
+        "@types/node": "^17.0.45",
+        "dotenv": "^16.4.5",
+        "nodemon": "^2.0.20",
+        "ts-node": "^10.0.0",
+        "typescript": "^5.4.5"
+    }
 }

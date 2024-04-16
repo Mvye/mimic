@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BaseEntity } from "typeorm"
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    OneToMany,
+    BaseEntity,
+} from 'typeorm';
 
 @Entity()
 export class ShopItem extends BaseEntity {
@@ -8,6 +14,6 @@ export class ShopItem extends BaseEntity {
     @Column()
     item_name!: string;
 
-    @Column("integer")
+    @Column('integer')
     cost!: number;
 }
