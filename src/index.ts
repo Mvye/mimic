@@ -14,7 +14,12 @@ import {
 import { User } from './models/User.js';
 import { ShopItem } from './models/ShopItem.js';
 import { UserItem } from './models/UserItem.js';
-import { AppDataSource, populateShopItems } from './data-source.js';
+import { Card } from './models/Card.js';
+import {
+    AppDataSource,
+    populateShopItems,
+    populateCards,
+} from './data-source.js';
 import { roll } from './gacha.js';
 
 config();
@@ -23,6 +28,7 @@ async function db_init() {
         await AppDataSource.initialize();
         console.log('Data Source has been initialized!');
         await populateShopItems();
+        await populateCards();
     } catch (error) {
         console.error(
             'Error during Data Source initialization or operation:',
@@ -69,6 +75,19 @@ async function addBalance(id: string, amount: number): Promise<User> {
 function getBalance(id: string): number {
     const user = currency.get(id);
     return user ? user.balance : 0;
+}
+
+function getRandomInt(max: number): number {
+    return Math.floor(Math.random() * max);
+}
+
+async function getCardByRarity(rarity: number): Promise<Card> {
+    const cardsInRarity = await AppDataSource.manager.findBy(Card, {
+        rarity: rarity,
+    });
+    if (cardsInRarity.length === 0) throw new Error('No cards in this rarity!');
+    const card = cardsInRarity[getRandomInt(cardsInRarity.length)];
+    return card;
 }
 
 // async function getItems(id: string){
@@ -145,13 +164,29 @@ client.on('interactionCreate', async (interaction: Interaction) => {
             } else {
                 resultHexColor = 0xd4a715;
             }
+
+            // TODO: Refactor this so it actually updates the collection/database as a function
+            const gachaCard = await getCardByRarity(resultIndex);
+
             const embedResult = new EmbedBuilder()
-                .setTitle('Roll Results')
-                .setDescription(
-                    `${command.user.displayName}, you have rolled a ${resultIndex}⭐.`
+                .setTitle(`Gacha Result: ${gachaCard.card_name}`)
+                .setDescription(`${'⭐'.repeat(gachaCard.rarity)}`)
+                .addFields(
+                    {
+                        name: 'Description',
+                        value: gachaCard.description,
+                        inline: true,
+                    },
+                    {
+                        name: 'Effect',
+                        value: `Points Effect: ${
+                            gachaCard.points_effect ?? ''
+                        }`,
+                        inline: true,
+                    }
                 )
                 .setColor(resultHexColor)
-                .setImage(command.user.avatarURL());
+                .setImage(gachaCard.image_url);
             await command.reply({
                 embeds: [embedResult],
             });
