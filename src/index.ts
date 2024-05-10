@@ -21,6 +21,7 @@ import {
     populateCards,
 } from './data-source.js';
 import { roll } from './gacha.js';
+import commands from './commands/Commands.js';
 
 config();
 async function db_init() {
@@ -120,101 +121,100 @@ client.on('interactionCreate', async (interaction: Interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
     const command = interaction as ChatInputCommandInteraction;
-
-    if (command.commandName === 'mimic') {
-        await command.reply("HI! I'm Mimic Bot");
-    }
-
-    if (command.commandName === 'howoldami') {
-        const user = command.user;
-        const age = Date.now() - user.createdTimestamp;
-        const ageDays = Math.floor(age / (1000 * 60 * 60 * 24));
-        await command.reply(
-            `${user.tag}, your account is ${ageDays} day(s) old.`
-        );
-    }
-
-    if (command.commandName === 'balance') {
-        const target = interaction.options.getUser('user') ?? interaction.user;
-        await command.reply(`${target.tag} has ${getBalance(target.id)}💰`);
-    }
-
-    if (command.commandName === 'faucet') {
-        const target = interaction.options.getUser('user') ?? interaction.user;
-        addBalance(target.id, 5);
-    }
-
-    if (command.commandName === 'gacha') {
-        const currentAmount = getBalance(interaction.user.id);
-        const tempGachaCost = 5;
-
-        if (tempGachaCost > currentAmount)
-            await command.reply(
-                `Sorry ${interaction.user}, you have ${currentAmount}💰 and a roll costs ${tempGachaCost}💰.`
-            );
-        else {
-            addBalance(interaction.user.id, -tempGachaCost);
-
-            const resultIndex = roll();
-            let resultHexColor: number;
-            if (resultIndex === 3) {
-                resultHexColor = 0x1183a6;
-            } else if (resultIndex === 4) {
-                resultHexColor = 0x9411a6;
-            } else {
-                resultHexColor = 0xd4a715;
-            }
-
-            // TODO: Refactor this so it actually updates the collection/database as a function
-            const gachaCard = await getCardByRarity(resultIndex);
-
-            const embedResult = new EmbedBuilder()
-                .setTitle(`Gacha Result: ${gachaCard.card_name}`)
-                .setDescription(`${'⭐'.repeat(gachaCard.rarity)}`)
-                .addFields(
-                    {
-                        name: 'Description',
-                        value: gachaCard.description,
-                        inline: true,
-                    },
-                    {
-                        name: 'Effect',
-                        value: `Points Effect: ${
-                            gachaCard.points_effect ?? ''
-                        }`,
-                        inline: true,
-                    }
-                )
-                .setColor(resultHexColor)
-                .setImage(gachaCard.image_url);
-            await command.reply({
-                embeds: [embedResult],
-            });
+    // TODO: Make a separate Database service so that the economy commands can work in their own file. The service should have functions
+    // that can be called to make various transactions to the databse. Like get/update etc. The database service should likely be the one
+    // to have the currency too.  
+    if (commands.has(command.commandName)) {
+        try {
+            await commands.get(command.commandName).execute(command);
+        } catch (error) {
+            console.error(error);
+            await command.reply({content: 'There was an error when executing this command.', ephemeral: true});
         }
     }
-
-    if (command.commandName === 'transfer') {
-        const currentAmount = getBalance(interaction.user.id);
-        const transferAmount = interaction.options.getInteger('amount');
-        const transferTarget = interaction.options.getUser('user');
-
-        if (transferAmount > currentAmount)
+    else {
+        if (command.commandName === 'mimic') {
+            await command.reply("HI! I'm Mimic Bot");
+        }
+        if (command.commandName === 'faucet') {
+            const target = interaction.options.getUser('user') ?? interaction.user;
+            addBalance(target.id, 5);
+            const currentBalance = getBalance(interaction.user.id);
             await command.reply(
-                `Sorry ${interaction.user}, you only have ${currentAmount}.`
+                `You got 5💰! Current balance is ${currentBalance}💰.`
             );
-        else if (transferAmount <= 0)
-            await command.reply(
-                `Please enter an amount greater than zero, ${interaction.user}.`
-            );
-        else {
-            addBalance(interaction.user.id, -transferAmount);
-            addBalance(transferTarget.id, transferAmount);
-
-            await interaction.reply(
-                `Successfully transferred ${transferAmount}💰 to ${
-                    transferTarget.tag
-                }. Your current balance is ${getBalance(interaction.user.id)}💰`
-            );
+        }
+        if (command.commandName === 'balance') {
+            const target = interaction.options.getUser('user') ?? interaction.user;
+            await command.reply(`${target.tag} has ${getBalance(target.id)}💰`);
+        }
+        if (command.commandName === 'gacha') {
+            const currentAmount = getBalance(interaction.user.id);
+            const tempGachaCost = 5;
+            if (tempGachaCost > currentAmount)
+                await command.reply(
+                    `Sorry ${interaction.user}, you have ${currentAmount}💰 and a roll costs ${tempGachaCost}💰.`
+                );
+            else {
+                addBalance(interaction.user.id, -tempGachaCost);
+                const resultIndex = roll();
+                let resultHexColor: number;
+                if (resultIndex === 3) {
+                    resultHexColor = 0x1183a6;
+                } else if (resultIndex === 4) {
+                    resultHexColor = 0x9411a6;
+                } else {
+                    resultHexColor = 0xd4a715;
+                }
+                // TODO: Refactor this so it actually updates the collection/database as a function
+                const gachaCard = await getCardByRarity(resultIndex);
+                const embedResult = new EmbedBuilder()
+                    .setTitle(`Gacha Result: ${gachaCard.card_name}`)
+                    .setDescription(`${'⭐'.repeat(gachaCard.rarity)}`)
+                    .addFields(
+                        {
+                            name: 'Description',
+                            value: gachaCard.description,
+                            inline: true,
+                        },
+                        {
+                            name: 'Effect',
+                            value: `Points Effect: ${
+                                gachaCard.points_effect ?? ''
+                            }`,
+                            inline: true,
+                        }
+                    )
+                    .setColor(resultHexColor)
+                    .setImage(gachaCard.image_url);
+                await command.reply({
+                    embeds: [embedResult],
+                });
+            }
+        }
+        if (command.commandName === 'transfer') {
+            const currentAmount = getBalance(interaction.user.id);
+            const transferAmount = interaction.options.getInteger('amount');
+            const transferTarget = interaction.options.getUser('user');
+    
+            if (transferAmount > currentAmount)
+                await command.reply(
+                    `Sorry ${interaction.user}, you only have ${currentAmount}.`
+                );
+            else if (transferAmount <= 0)
+                await command.reply(
+                    `Please enter an amount greater than zero, ${interaction.user}.`
+                );
+            else {
+                addBalance(interaction.user.id, -transferAmount);
+                addBalance(transferTarget.id, transferAmount);
+    
+                await interaction.reply(
+                    `Successfully transferred ${transferAmount}💰 to ${
+                        transferTarget.tag
+                    }. Your current balance is ${getBalance(interaction.user.id)}💰`
+                );
+            }
         }
     }
 });
